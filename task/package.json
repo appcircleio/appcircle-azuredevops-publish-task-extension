@@ -1,0 +1,13 @@
+{
+  "name": "appcircle-azuredevops-entstore-extension.task",
+  "version": "0.0.70",
+  "description": "NPM Package for Appcircle Publish Task",
+  "main": "index.js",
+  "author": "Appcircle",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.7.7",
+    "azure-devops-extension-sdk": "^4.0.2",
+    "azure-pipelines-task-lib": "^4.17.3"
+  }
+}

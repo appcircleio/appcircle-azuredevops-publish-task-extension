@@ -1,0 +1,56 @@
+{
+  "manifestVersion": 1,
+  "version": "0.1.0",
+  "publisher": "Appcircle",
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "tags": [
+    "app store",
+    "google play",
+    "Beta Distribution",
+    "Mobile",
+    "iOS",
+    "Android",
+    "IPA",
+    "APK/AAB"
+  ],
+  "description": "Upload a binary to an Appcircle Publish profile and/or trigger its publish flow.",
+  "categories": [
+    "Azure Pipelines"
+  ],
+  "icons": {
+    "default": "images/extension-icon.png"
+  },
+  "files": [
+    {
+      "path": "task"
+    },
+    {
+      "path": "images",
+      "addressable": true
+    }
+  ],
+  "content": {
+    "details": {
+      "path": "README.md"
+    },
+    "license": {
+      "path": "LICENSE"
+    }
+  },
+  "contributions": [
+    {
+      "id": "custom-build-release-task",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "task"
+      }
+    }
+  ]
+}
