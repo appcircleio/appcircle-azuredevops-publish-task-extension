@@ -14,7 +14,7 @@
     "url": "https://github.com/appcircleio/appcircle-azuredevops-entstore-task-extension"
   },
   "dependencies": {
-    "axios": "^1.7.7",
+    "axios": "^1.16.0",
     "azure-devops-extension-sdk": "^4.0.2",
     "azure-pipelines-task-lib": "^4.17.3"
   },
