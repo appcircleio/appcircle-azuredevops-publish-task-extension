@@ -32,6 +32,7 @@ The task has two independent switches — `upload` and `publish` — both defaul
   inputs:
     personalAPIToken: $(AC_PERSONAL_API_TOKEN)
     platform: ios # or android
+    subOrganizationName: $(AC_SUB_ORGANIZATION_NAME) # optional
     publishProfile: $(AC_PUBLISH_PROFILE)
     upload: true
     appPath: $(AC_APP_PATH)
@@ -71,6 +72,7 @@ The task has two independent switches — `upload` and `publish` — both defaul
 - `appPath`: Path to the application file. Required when `upload` is enabled. For iOS use a `.ipa` file; for Android use a `.apk` or `.aab` file.
 - `authEndpoint` (optional): Authentication endpoint URL for self-hosted Appcircle installations. Defaults to `https://auth.appcircle.io`.
 - `apiEndpoint` (optional): API endpoint URL for self-hosted Appcircle installations. Defaults to `https://api.appcircle.io`.
+- `subOrganizationName` (optional): Sub-organization name for the publish profile. Leave empty to use the root organization. Use this when your Personal API Token belongs to the root organization but the target publish profile lives in a sub-organization.
 
 > **Self-signed or private CA certificates:** If your self-hosted Appcircle server uses a self-signed certificate (or one issued by a private/internal CA), requests will fail certificate validation. The task does not disable TLS verification. Trust the server's CA on the build agent — set the `NODE_EXTRA_CA_CERTS` environment variable to a PEM file containing the CA certificate, or add the CA to the system certificate store.
 
