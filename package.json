@@ -4,6 +4,7 @@
   "description": "NPM Package for Appcircle Publish Extension",
   "main": "index.js",
   "scripts": {
+    "test": "node --test tests/taskStatus.test.js",
     "package": "tsc ./task/index.ts",
     "package:watch": "tsc --watch ./task/index.ts"
   },

@@ -3,6 +3,12 @@ import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import * as fs from "fs";
 import * as FormData from "form-data";
 import * as path from "path";
+import {
+  TASK_REQUEST_TIMEOUT_MS,
+  TaskPollOptions,
+  TaskStatusReply,
+  waitForTaskCompletion,
+} from "./taskStatus";
 
 const FLOW_STEP_STATUS: Record<number, string> = {
   0: "Success", 1: "Failed", 2: "Cancelled", 3: "Timeout",
@@ -100,11 +106,7 @@ async function run() {
     // --- Upload ---
     if (upload) {
       const uploadResponse = await uploadPublishApp(appcircleApi, platform, publishProfileId, appPath as string);
-      const ok = await checkTaskStatus(appcircleApi, uploadResponse.taskId);
-      if (!ok) {
-        tl.setResult(tl.TaskResult.Failed, `${uploadResponse.taskId} id upload request failed with status Cancelled`);
-        return;
-      }
+      await checkTaskStatus(appcircleApi, uploadResponse.taskId);
       appVersionId = await getLatestAppVersionId(appcircleApi, platform, publishProfileId);
       console.log(`${appPath} uploaded to the Appcircle Publish profile '${publishProfile}' successfully`);
     }
@@ -338,18 +340,45 @@ export async function uploadPublishApp(api: AxiosInstance, platform: string, pub
   return commitResponse.data;
 }
 
-export async function checkTaskStatus(api: AxiosInstance, taskId: string, currentAttempt = 0) {
-  const response = await api.get(`/task/v1/tasks/${taskId}`, {
-    headers: UploadServiceHeaders.getHeaders(),
-  });
-  if (response?.data.stateValue == 1 && currentAttempt < 100) {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    return checkTaskStatus(api, taskId, currentAttempt + 1);
-  }
-  if (response.data.stateValue === 2) {
-    return false;
-  }
-  return true;
+function taskStatusReader(
+  api: AxiosInstance,
+  headers: () => AxiosRequestConfig["headers"],
+  timeoutMs: number
+) {
+  return async (taskId: string): Promise<TaskStatusReply> => {
+    try {
+      const url = `/task/v1/tasks/${encodeURIComponent(taskId)}`;
+      const response = await api.get(url, {
+        headers: headers(),
+        timeout: timeoutMs,
+        validateStatus: () => true,
+      });
+      const body =
+        response.data && typeof response.data === "object"
+          ? response.data
+          : undefined;
+      return { httpStatus: response.status, body };
+    } catch {
+      return { httpStatus: 0 };
+    }
+  };
+}
+
+export async function checkTaskStatus(
+  api: AxiosInstance,
+  taskId: string,
+  options?: TaskPollOptions
+): Promise<void> {
+  await waitForTaskCompletion(
+    taskId,
+    taskStatusReader(
+      api,
+      UploadServiceHeaders.getHeaders,
+      options?.requestTimeoutMs ?? TASK_REQUEST_TIMEOUT_MS
+    ),
+    (id) => `${id} id upload request failed with status Cancelled`,
+    options
+  );
 }
 
 export async function getPublishId(api: AxiosInstance, platform: string, publishProfileId: string, appVersionId: string): Promise<string> {
